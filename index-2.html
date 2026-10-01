@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090d">
+<meta name="description" content="Zubee AI - Advanced AI Assistant">
+<title>Zubee AI</title>
+<style>
+:root{--bg:#08090d;--panel:#10121a;--panel2:#151823;--text:#f5f7fb;--muted:#8f96a8;--border:rgba(255,255,255,.09);--accent:#7c5cff;--accent2:#5d8cff;--danger:#ff5571}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 10%,rgba(124,92,255,.14),transparent 30%),radial-gradient(circle at 90% 80%,rgba(93,140,255,.09),transparent 30%),var(--bg);color:var(--text)}
+.app{height:100dvh;display:flex;overflow:hidden}
+.sidebar{width:285px;height:100%;background:rgba(12,14,21,.9);backdrop-filter:blur(24px);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:14px;z-index:50;transition:.3s}
+.brand{display:flex;align-items:center;gap:11px;padding:8px 7px 18px}.logo,.welcome-logo{display:grid;place-items:center;background:linear-gradient(135deg,#7c5cff,#5d8cff);box-shadow:0 12px 40px rgba(124,92,255,.3)}
+.logo{width:39px;height:39px;border-radius:13px;font-size:20px}.brand-name{font-size:18px;font-weight:800}.brand-version{color:var(--muted);font-size:10px;margin-left:4px}
+.new-chat{width:100%;border:1px solid var(--border);background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(93,140,255,.08));color:var(--text);padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:700;text-align:left}
+.search-box{margin:13px 0;position:relative}.search-box input{width:100%;padding:11px 12px 11px 36px;border-radius:12px;border:1px solid var(--border);background:var(--panel);color:var(--text);outline:none}.search-icon{position:absolute;left:12px;top:10px;opacity:.55}
+.chat-list{flex:1;overflow-y:auto}.chat-item{padding:11px;border-radius:12px;cursor:pointer;color:#cdd2df;margin-bottom:3px;display:flex;align-items:center;gap:9px;font-size:13px}.chat-item:hover{background:rgba(255,255,255,.05)}.chat-item.active{background:rgba(124,92,255,.14);color:white}.chat-title{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.delete-chat{opacity:0;color:var(--danger);border:0;background:none;cursor:pointer}.chat-item:hover .delete-chat{opacity:1}
+.sidebar-bottom{border-top:1px solid var(--border);padding-top:10px}.side-button{width:100%;padding:10px;border:0;background:none;color:#c8ccda;text-align:left;border-radius:10px;cursor:pointer}.side-button:hover{background:rgba(255,255,255,.05)}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}.topbar{height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--border);background:rgba(8,9,13,.68);backdrop-filter:blur(22px)}.top-left{display:flex;align-items:center;gap:10px}.mobile-menu{display:none}.model-pill{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--border);font-size:12px}.status-dot{width:7px;height:7px;border-radius:50%;background:#35d98b;box-shadow:0 0 12px #35d98b}.top-actions{display:flex;gap:7px}.icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:16px;display:grid;place-items:center}
+.chat-area{flex:1;overflow-y:auto;scroll-behavior:smooth}.chat-inner{width:min(920px,100%);margin:auto;padding:35px 22px 150px}
+.welcome{min-height:55vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}.welcome-logo{width:78px;height:78px;border-radius:25px;font-size:38px;margin-bottom:20px}.welcome h1{font-size:clamp(30px,5vw,50px);letter-spacing:-2px}.gradient-text{background:linear-gradient(90deg,#fff,#9d8cff,#70a2ff);-webkit-background-clip:text;background-clip:text;color:transparent}.welcome p{color:var(--muted);margin-top:10px;max-width:570px;line-height:1.6}
+.quick-grid{width:100%;max-width:760px;margin-top:28px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.quick{text-align:left;padding:14px;border-radius:15px;border:1px solid var(--border);background:rgba(255,255,255,.025);color:var(--text);cursor:pointer}.quick:hover{border-color:rgba(124,92,255,.4);background:rgba(124,92,255,.06)}.quick strong{display:block;margin-bottom:5px}.quick span{color:var(--muted);font-size:12px}
+.message-row{display:flex;gap:13px;margin:25px 0;animation:appear .25s ease}.message-row.user{justify-content:flex-end}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.avatar{width:34px;height:34px;min-width:34px;border-radius:11px;display:grid;place-items:center;background:var(--panel2);border:1px solid var(--border)}.user .avatar{background:linear-gradient(135deg,#5d8cff,#7c5cff)}.message-content{max-width:min(760px,85%)}.user .message-content{background:linear-gradient(135deg,#5842d7,#4d65d9);border-radius:19px 19px 5px 19px;padding:12px 15px}.ai .message-content{padding-top:2px}.message-text{line-height:1.72;color:#e7eaf1;white-space:pre-wrap;word-break:break-word}.message-meta{display:flex;gap:7px;margin-top:9px}.meta-btn{border:1px solid var(--border);background:var(--panel);color:var(--muted);padding:5px 8px;border-radius:8px;cursor:pointer;font-size:11px}
+.typing{display:flex;gap:5px;padding:10px 0}.typing i{width:7px;height:7px;border-radius:50%;background:#aaa;animation:bounce 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}
+}
+.composer-wrap{position:absolute;bottom:0;left:0;right:0;padding:15px 20px 20px;background:linear-gradient(to top,var(--bg) 65%,transparent)}.composer{width:min(900px,100%);margin:auto;background:rgba(20,22,31,.94);backdrop-filter:blur(25px);border:1px solid var(--border);border-radius:21px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}.preview-area{display:none;padding:10px;border-bottom:1px solid var(--border);gap:7px;flex-wrap:wrap}.preview-area.show{display:flex}.attachment{border:1px solid var(--border);background:var(--panel2);border-radius:11px;padding:8px 10px;font-size:11px;color:#cdd2df}.composer-input{display:flex;align-items:flex-end;gap:8px;padding:10px}.composer-tools{display:flex;align-items:center;gap:5px}.tool{width:38px;height:38px;border:0;border-radius:11px;background:transparent;color:#aeb4c3;cursor:pointer;display:grid;place-items:center;font-size:16px}.tool:hover{background:rgba(255,255,255,.06);color:white}textarea{flex:1;min-height:46px;max-height:180px;resize:none;border:0;outline:0;background:transparent;color:var(--text);font:inherit;line-height:1.5;padding:10px 4px}textarea::placeholder{color:#777e91}.send{width:42px;height:42px;border:0;border-radius:13px;background:linear-gradient(135deg,#7c5cff,#5d8cff);color:white;cursor:pointer;font-size:17px}.send:disabled{opacity:.35;cursor:not-allowed}.composer-footer{padding:0 14px 9px;color:#656c7d;font-size:10px;display:flex;justify-content:space-between}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}.modal.show{display:flex}.modal-card{width:min(500px,100%);background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.setting{padding:14px 0;border-bottom:1px solid var(--border)}.setting-title{font-weight:700;margin-bottom:5px}.setting-desc{font-size:12px;color:var(--muted)}select{margin-top:9px;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--panel2);color:white}
+.toast{position:fixed;left:50%;bottom:95px;transform:translateX(-50%) translateY(15px);padding:10px 14px;border-radius:11px;background:#20232e;color:white;border:1px solid var(--border);opacity:0;pointer-events:none;transition:.25s;z-index:200;font-size:12px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:760px){.sidebar{position:fixed;left:-300px;top:0;bottom:0;box-shadow:20px 0 50px rgba(0,0,0,.4)}.sidebar.open{left:0}.mobile-menu{display:grid}.quick-grid{grid-template-columns:1fr}.chat-inner{padding:20px 13px 145px}.composer-wrap{padding:9px 9px 10px}.composer{border-radius:18px}.message-content{max-width:88%}.topbar{padding:0 10px}.model-pill{font-size:11px}}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#303443;border-radius:20px}
+body.light{--bg:#f4f6fa;--panel:#fff;--panel2:#eef0f5;--text:#171923;--muted:#667085;--border:rgba(20,25,40,.1)}body.light .topbar{background:rgba(244,246,250,.75)}body.light .sidebar{background:rgba(255,255,255,.85)}body.light .message-text{color:#252938}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+<div class="brand"><div class="logo">✦</div><div><div class="brand-name">Zubee AI</div><span class="brand-version">NEXT GEN</span></div></div>
+<button class="new-chat" onclick="newChat()">＋ New conversation</button>
+<div class="search-box"><span class="search-icon">⌕</span><input id="chatSearch" placeholder="Search conversations..." oninput="renderChatList()"></div>
+<div class="chat-list" id="chatList"></div>
+<div class="sidebar-bottom">
+<button class="side-button" onclick="exportChat()">↓ Export conversation</button>
+<button class="side-button" onclick="openSettings()">⚙ Settings</button>
+</div>
+</aside>
+<main class="main">
+<header class="topbar">
+<div class="top-left"><button class="icon-btn mobile-menu" onclick="toggleSidebar()">☰</button><div class="model-pill"><span class="status-dot"></span>Zubee AI</div></div>
+<div class="top-actions"><button class="icon-btn" onclick="toggleTheme()">◐</button><button class="icon-btn" onclick="exportChat()">↓</button><button class="icon-btn" onclick="openSettings()">⚙</button></div>
+</header>
+<section class="chat-area" id="chatArea"><div class="chat-inner" id="chatInner">
+<div class="welcome" id="welcome">
+<div class="welcome-logo">✦</div><h1>Meet <span class="gradient-text">Zubee AI</span></h1>
+<p>Your intelligent workspace for thinking, learning, creating, analysing and exploring ideas.</p>
+<div class="quick-grid">
+<button class="quick" onclick="quickPrompt('Explain a difficult topic to me in very simple language.')"><strong>🧠 Learn</strong><span>Explain any concept simply</span></button>
+<button class="quick" onclick="quickPrompt('Help me create a powerful study plan.')"><strong>📚 Study</strong><span>Build a smart study strategy</span></button>
+<button class="quick" onclick="quickPrompt('Help me brainstorm an innovative project idea.')"><strong>💡 Create</strong><span>Generate new ideas</span></button>
+<button class="quick" onclick="quickPrompt('Analyse this problem and give me the best possible approach.')"><strong>⚡ Analyse</strong><span>Break complex problems down</span></button>
+</div></div>
+<div id="messages"></div>
+</div></section>
+<div class="composer-wrap"><div class="composer">
+<div class="preview-area" id="previewArea"></div>
+<div class="composer-input"><div class="composer-tools">
+<button class="tool" title="Attach file" onclick="document.getElementById('fileInput').click()">＋</button>
+<button class="tool" title="Voice input" onclick="voiceInput()">🎙</button>
+</div>
+<textarea id="prompt" rows="1" placeholder="Message Zubee AI..." oninput="handleInput()" onkeydown="handleKey(event)"></textarea>
+<button class="send" id="sendButton" onclick="sendMessage()" disabled>↑</button>
+</div>
+<div class="composer-footer"><span>AI can make mistakes. Verify important information.</span><span id="counter">0</span></div>
+</div></div>
+</main>
+</div>
+<input id="fileInput" type="file" hidden multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv" onchange="handleFiles(event)">
+<div class="modal" id="settingsModal"><div class="modal-card"><div class="modal-head"><h2>Settings</h2><button class="icon-btn" onclick="closeSettings()">×</button></div>
+<div class="setting"><div class="setting-title">Appearance</div><div class="setting-desc">Choose your preferred interface theme.</div><select onchange="setTheme(this.value)"><option value="dark">Dark</option><option value="light">Light</option></select></div>
+<div class="setting"><div class="setting-title">Local storage</div><div class="setting-desc">Conversations are stored locally in this browser.</div></div>
+<div class="setting"><div class="setting-title">Version</div><div class="setting-desc">Zubee AI experimental interface • v1.0</div></div>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+/* =========================================================
+   ZUBEE AI — PRODUCTION FRONTEND ENGINE
+   UI is intentionally preserved. This script only replaces
+   the old local-demo AI with the real Vercel/Gemini backend.
+   ========================================================= */
+
+const API_URL = "https://zubee-ai.vercel.app/api/chat";
+const STORAGE_KEY = "zubee_ai_state_v2";
+const REQUEST_TIMEOUT_MS = 45000;
+
+let state = {
+  chats: [],
+  activeChat: null,
+  theme: "dark"
+};
+
+let attachments = [];
+let requestInFlight = false;
+
+/* ---------- STORAGE ---------- */
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn("Could not save local state:", error);
+  }
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) state = JSON.parse(saved);
+  } catch (error) {
+    console.warn("Could not load local state:", error);
+  }
+
+  if (!Array.isArray(state.chats) || !state.chats.length) {
+    createChat();
+  }
+
+  if (!state.activeChat || !state.chats.some(c => c.id === state.activeChat)) {
+    state.activeChat = state.chats[0].id;
+  }
+
+  applyTheme();
+  renderChatList();
+  renderMessages();
+}
+
+/* ---------- CHAT STATE ---------- */
+function createChat() {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+  state.chats.unshift({
+    id,
+    title: "New conversation",
+    messages: []
+  });
+  state.activeChat = id;
+  saveState();
+}
+
+function getActiveChat() {
+  return state.chats.find(c => c.id === state.activeChat) || null;
+}
+
+function newChat() {
+  if (requestInFlight) return;
+  createChat();
+  renderChatList();
+  renderMessages();
+  const input = document.getElementById("prompt");
+  if (input) input.focus();
+  closeSidebarMobile();
+}
+
+function deleteChat(id) {
+  state.chats = state.chats.filter(c => c.id !== id);
+
+  if (!state.chats.length) createChat();
+
+  if (state.activeChat === id) {
+    state.activeChat = state.chats[0].id;
+  }
+
+  saveState();
+  renderChatList();
+  renderMessages();
+}
+
+function selectChat(id) {
+  if (!state.chats.some(c => c.id === id)) return;
+  state.activeChat = id;
+  saveState();
+  renderChatList();
+  renderMessages();
+  closeSidebarMobile();
+}
+
+/* ---------- SIDEBAR ---------- */
+function renderChatList() {
+  const list = document.getElementById("chatList");
+  const searchInput = document.getElementById("chatSearch");
+  if (!list || !searchInput) return;
+
+  const search = searchInput.value.toLowerCase().trim();
+  list.innerHTML = "";
+
+  state.chats
+    .filter(chat => chat.title.toLowerCase().includes(search))
+    .forEach(chat => {
+      const item = document.createElement("div");
+      item.className = "chat-item " + (chat.id === state.activeChat ? "active" : "");
+
+      item.innerHTML = `
+        <span>💬</span>
+        <span class="chat-title">${escapeHTML(chat.title)}</span>
+        <button class="delete-chat" aria-label="Delete chat">×</button>
+      `;
+
+      const deleteButton = item.querySelector(".delete-chat");
+      deleteButton.addEventListener("click", event => {
+        event.stopPropagation();
+        deleteChat(chat.id);
+      });
+
+      item.addEventListener("click", () => selectChat(chat.id));
+      list.appendChild(item);
+    });
+}
+
+/* ---------- MESSAGE RENDERING ---------- */
+function renderMessages() {
+  const container = document.getElementById("messages");
+  const welcome = document.getElementById("welcome");
+  if (!container || !welcome) return;
+
+  container.innerHTML = "";
+
+  const chat = getActiveChat();
+  if (!chat) return;
+
+  welcome.style.display = chat.messages.length ? "none" : "flex";
+
+  chat.messages.forEach(message => {
+    addMessageToDOM(message.role, message.text, false);
+  });
+
+  scrollBottom();
+}
+
+function addMessageToDOM(role, text, animate = true) {
+  const container = document.getElementById("messages");
+  if (!container) return null;
+
+  const row = document.createElement("div");
+  row.className = "message-row " + (role === "user" ? "user" : "ai");
+
+  const avatar = role === "user" ? "U" : "✦";
+  const content = document.createElement("div");
+  content.className = "message-content";
+
+  const textNode = document.createElement("div");
+  textNode.className = "message-text";
+  textNode.innerHTML = formatText(text);
+  content.appendChild(textNode);
+
+  if (role === "ai") {
+    const meta = document.createElement("div");
+    meta.className = "message-meta";
+    meta.innerHTML = `
+      <button class="meta-btn" type="button">Copy</button>
+      <button class="meta-btn" type="button">🔊</button>
+      <button class="meta-btn" type="button">↻ Regenerate</button>
+    `;
+
+    meta.children[0].addEventListener("click", () => copyMessageText(textNode));
+    meta.children[1].addEventListener("click", () => speakMessageText(textNode));
+    meta.children[2].addEventListener("click", () => regenerate());
+    content.appendChild(meta);
+  }
+
+  row.innerHTML = `<div class="avatar">${avatar}</div>`;
+  row.appendChild(content);
+  container.appendChild(row);
+
+  if (animate) scrollBottom();
+  return row;
+}
+
+function addTypingMessage() {
+  const container = document.getElementById("messages");
+  if (!container) return null;
+
+  const row = document.createElement("div");
+  row.className = "message-row ai";
+  row.innerHTML = `
+    <div class="avatar">✦</div>
+    <div class="message-content">
+      <div class="typing"><i></i><i></i><i></i></div>
+    </div>
+  `;
+  container.appendChild(row);
+  scrollBottom();
+  return row;
+}
+
+/* ---------- REAL AI REQUEST ---------- */
+async function askZubee(message, previousMessages) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        message,
+        history: previousMessages.slice(-20)
+      }),
+      signal: controller.signal,
+      cache: "no-store"
+    });
+
+    const raw = await response.text();
+    let data = {};
+
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      throw new Error(`Backend returned non-JSON response (${response.status}).`);
+    }
+
+    if (!response.ok) {
+      const detail = data?.error || data?.details || `HTTP ${response.status}`;
+      throw new Error(String(detail));
+    }
+
+    if (!data || typeof data.answer !== "string" || !data.answer.trim()) {
+      throw new Error("Gemini returned an empty answer.");
+    }
+
+    return data.answer.trim();
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("The AI request timed out. Please try again.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/* ---------- SEND ---------- */
+async function sendMessage() {
+  const input = document.getElementById("prompt");
+  const button = document.getElementById("sendButton");
+  const welcome = document.getElementById("welcome");
+
+  if (!input || !button || requestInFlight) return;
+
+  const text = input.value.trim();
+  if (!text) return;
+
+  const activeChat = getActiveChat();
+  if (!activeChat) return;
+
+  requestInFlight = true;
+  input.disabled = true;
+  button.disabled = true;
+
+  if (welcome) welcome.style.display = "none";
+
+  /* Capture history BEFORE adding the current user message,
+     because the backend also receives `message` separately. */
+  const previousMessages = activeChat.messages.slice(-20);
+
+  if (activeChat.messages.length === 0) {
+    activeChat.title = text.length > 35 ? text.slice(0, 35) + "..." : text;
+  }
+
+  activeChat.messages.push({ role: "user", text });
+  input.value = "";
+  handleInput();
+  saveState();
+  renderChatList();
+  addMessageToDOM("user", text);
+
+  const typingRow = addTypingMessage();
+
+  try {
+    const answer = await askZubee(text, previousMessages);
+
+    if (typingRow) typingRow.remove();
+
+    activeChat.messages.push({
+      role: "assistant",
+      text: answer
+    });
+
+    saveState();
+    addMessageToDOM("ai", answer);
+  } catch (error) {
+    console.error("Zubee request failed:", error);
+
+    if (typingRow) typingRow.remove();
+
+    const safeMessage =
+      "⚠️ Zubee couldn't get an answer right now.\n\n" +
+      (error?.message || "Unknown connection error.") +
+      "\n\nPlease check the Vercel deployment and Gemini API quota/key, then try again.";
+
+    activeChat.messages.push({
+      role: "assistant",
+      text: safeMessage
+    });
+
+    saveState();
+    addMessageToDOM("ai", safeMessage);
+  } finally {
+    requestInFlight = false;
+    input.disabled = false;
+    button.disabled = !input.value.trim();
+    input.focus();
+    scrollBottom();
+  }
+}
+
+/* ---------- INPUT ---------- */
+function handleInput() {
+  const input = document.getElementById("prompt");
+  const button = document.getElementById("sendButton");
+  const counter = document.getElementById("counter");
+
+  if (!input || !button) return;
+
+  button.disabled = requestInFlight || !input.value.trim();
+
+  if (counter) counter.textContent = input.value.length;
+
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 180) + "px";
+}
+
+function handleKey(event) {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+}
+
+function quickPrompt(text) {
+  const input = document.getElementById("prompt");
+  if (!input) return;
+  input.value = text;
+  handleInput();
+  input.focus();
+}
+
+/* ---------- CHAT ACTIONS ---------- */
+function regenerate() {
+  const chat = getActiveChat();
+  if (!chat || requestInFlight || !chat.messages.length) return;
+
+  const lastUserIndex = [...chat.messages]
+    .map((message, index) => ({ message, index }))
+    .reverse()
+    .find(item => item.message.role === "user");
+
+  if (!lastUserIndex) return;
+
+  const userText = lastUserIndex.message.text;
+  const previousMessages = chat.messages.slice(0, lastUserIndex.index);
+
+  /* Remove anything after the selected user message. */
+  chat.messages = chat.messages.slice(0, lastUserIndex.index + 1);
+  saveState();
+  renderMessages();
+
+  requestInFlight = true;
+  const input = document.getElementById("prompt");
+  const button = document.getElementById("sendButton");
+  if (input) input.disabled = true;
+  if (button) button.disabled = true;
+
+  const typingRow = addTypingMessage();
+
+  askZubee(userText, previousMessages)
+    .then(answer => {
+      if (typingRow) typingRow.remove();
+      chat.messages.push({ role: "assistant", text: answer });
+      saveState();
+      addMessageToDOM("ai", answer);
+    })
+    .catch(error => {
+      if (typingRow) typingRow.remove();
+      const safeMessage = "⚠️ Regeneration failed.\n\n" + (error?.message || "Unknown error.");
+      chat.messages.push({ role: "assistant", text: safeMessage });
+      saveState();
+      addMessageToDOM("ai", safeMessage);
+    })
+    .finally(() => {
+      requestInFlight = false;
+      if (input) {
+        input.disabled = false;
+        input.focus();
+      }
+      handleInput();
+    });
+}
+
+function copyMessageText(element) {
+  const text = element?.innerText || "";
+  if (!text) return;
+
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast("Copied ✓"));
+  } else {
+    const temp = document.createElement("textarea");
+    temp.value = text;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    temp.remove();
+    showToast("Copied ✓");
+  }
+}
+
+function speakMessageText(element) {
+  const text = element?.innerText || "";
+
+  if (!("speechSynthesis" in window)) {
+    showToast("Speech is not supported here.");
+    return;
+  }
+
+  speechSynthesis.cancel();
+  speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+}
+
+/* ---------- FILE PREVIEW ---------- */
+function handleFiles(event) {
+  attachments = Array.from(event.target.files || []);
+  const preview = document.getElementById("previewArea");
+  if (!preview) return;
+
+  preview.innerHTML = "";
+
+  attachments.forEach(file => {
+    const item = document.createElement("div");
+    item.className = "attachment";
+    item.textContent = "📎 " + file.name;
+    preview.appendChild(item);
+  });
+
+  preview.classList.toggle("show", attachments.length > 0);
+}
+
+/* ---------- EXPORT ---------- */
+function exportChat() {
+  const chat = getActiveChat();
+  if (!chat) return;
+
+  let output = "ZUBEE AI CONVERSATION\n\n";
+
+  chat.messages.forEach(message => {
+    output +=
+      (message.role === "user" ? "YOU" : "ZUBEE AI") +
+      ":\n" + message.text + "\n\n";
+  });
+
+  const blob = new Blob([output], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "zubee-ai-conversation.txt";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+
+  showToast("Conversation exported ✓");
+}
+
+/* ---------- THEME ---------- */
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  applyTheme();
+  saveState();
+}
+
+function setTheme(theme) {
+  state.theme = theme === "light" ? "light" : "dark";
+  applyTheme();
+  saveState();
+}
+
+function applyTheme() {
+  document.body.classList.toggle("light", state.theme === "light");
+}
+
+/* ---------- SETTINGS ---------- */
+function openSettings() {
+  document.getElementById("settingsModal")?.classList.add("show");
+}
+
+function closeSettings() {
+  document.getElementById("settingsModal")?.classList.remove("show");
+}
+
+/* ---------- SIDEBAR ---------- */
+function toggleSidebar() {
+  document.getElementById("sidebar")?.classList.toggle("open");
+}
+
+function closeSidebarMobile() {
+  document.getElementById("sidebar")?.classList.remove("open");
+}
+
+/* ---------- UTILITIES ---------- */
+function scrollBottom() {
+  const area = document.getElementById("chatArea");
+  if (!area) return;
+  requestAnimationFrame(() => {
+    area.scrollTop = area.scrollHeight;
+  });
+}
+
+let toastTimer;
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function escapeHTML(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatText(text) {
+  let safe = escapeHTML(text);
+  safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+  safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  return safe;
+}
+
+/* ---------- KEYBOARD ---------- */
+document.addEventListener("keydown", event => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+    event.preventDefault();
+    document.getElementById("chatSearch")?.focus();
+  }
+
+  if (event.key === "Escape") {
+    closeSettings();
+    closeSidebarMobile();
+  }
+});
+
+/* ---------- START ---------- */
+loadState();
+</script>
+</body>
+</html>
