@@ -2,171 +2,563 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08090d">
-<meta name="description" content="Zubee AI - Advanced AI Assistant">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080812">
+<meta name="description" content="Zubee AI — your intelligent AI assistant">
 <title>Zubee AI</title>
+
 <style>
-:root{--bg:#08090d;--panel:#10121a;--panel2:#151823;--text:#f5f7fb;--muted:#8f96a8;--border:rgba(255,255,255,.09);--accent:#7c5cff;--accent2:#5d8cff;--danger:#ff5571}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden}
-body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 10%,rgba(124,92,255,.14),transparent 30%),radial-gradient(circle at 90% 80%,rgba(93,140,255,.09),transparent 30%),var(--bg);color:var(--text)}
-.app{height:100dvh;display:flex;overflow:hidden}
-.sidebar{width:285px;height:100%;background:rgba(12,14,21,.9);backdrop-filter:blur(24px);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:14px;z-index:50;transition:.3s}
-.brand{display:flex;align-items:center;gap:11px;padding:8px 7px 18px}.logo,.welcome-logo{display:grid;place-items:center;background:linear-gradient(135deg,#7c5cff,#5d8cff);box-shadow:0 12px 40px rgba(124,92,255,.3)}
-.logo{width:39px;height:39px;border-radius:13px;font-size:20px}.brand-name{font-size:18px;font-weight:800}.brand-version{color:var(--muted);font-size:10px;margin-left:4px}
-.new-chat{width:100%;border:1px solid var(--border);background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(93,140,255,.08));color:var(--text);padding:12px 14px;border-radius:14px;cursor:pointer;font-weight:700;text-align:left}
-.search-box{margin:13px 0;position:relative}.search-box input{width:100%;padding:11px 12px 11px 36px;border-radius:12px;border:1px solid var(--border);background:var(--panel);color:var(--text);outline:none}.search-icon{position:absolute;left:12px;top:10px;opacity:.55}
-.chat-list{flex:1;overflow-y:auto}.chat-item{padding:11px;border-radius:12px;cursor:pointer;color:#cdd2df;margin-bottom:3px;display:flex;align-items:center;gap:9px;font-size:13px}.chat-item:hover{background:rgba(255,255,255,.05)}.chat-item.active{background:rgba(124,92,255,.14);color:white}.chat-title{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.delete-chat{opacity:0;color:var(--danger);border:0;background:none;cursor:pointer}.chat-item:hover .delete-chat{opacity:1}
-.sidebar-bottom{border-top:1px solid var(--border);padding-top:10px}.side-button{width:100%;padding:10px;border:0;background:none;color:#c8ccda;text-align:left;border-radius:10px;cursor:pointer}.side-button:hover{background:rgba(255,255,255,.05)}
-.main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}.topbar{height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--border);background:rgba(8,9,13,.68);backdrop-filter:blur(22px)}.top-left{display:flex;align-items:center;gap:10px}.mobile-menu{display:none}.model-pill{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--panel);border:1px solid var(--border);font-size:12px}.status-dot{width:7px;height:7px;border-radius:50%;background:#35d98b;box-shadow:0 0 12px #35d98b}.top-actions{display:flex;gap:7px}.icon-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer;font-size:16px;display:grid;place-items:center}
-.chat-area{flex:1;overflow-y:auto;scroll-behavior:smooth}.chat-inner{width:min(920px,100%);margin:auto;padding:35px 22px 150px}
-.welcome{min-height:55vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}.welcome-logo{width:78px;height:78px;border-radius:25px;font-size:38px;margin-bottom:20px}.welcome h1{font-size:clamp(30px,5vw,50px);letter-spacing:-2px}.gradient-text{background:linear-gradient(90deg,#fff,#9d8cff,#70a2ff);-webkit-background-clip:text;background-clip:text;color:transparent}.welcome p{color:var(--muted);margin-top:10px;max-width:570px;line-height:1.6}
-.quick-grid{width:100%;max-width:760px;margin-top:28px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.quick{text-align:left;padding:14px;border-radius:15px;border:1px solid var(--border);background:rgba(255,255,255,.025);color:var(--text);cursor:pointer}.quick:hover{border-color:rgba(124,92,255,.4);background:rgba(124,92,255,.06)}.quick strong{display:block;margin-bottom:5px}.quick span{color:var(--muted);font-size:12px}
-.message-row{display:flex;gap:13px;margin:25px 0;animation:appear .25s ease}.message-row.user{justify-content:flex-end}@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.avatar{width:34px;height:34px;min-width:34px;border-radius:11px;display:grid;place-items:center;background:var(--panel2);border:1px solid var(--border)}.user .avatar{background:linear-gradient(135deg,#5d8cff,#7c5cff)}.message-content{max-width:min(760px,85%)}.user .message-content{background:linear-gradient(135deg,#5842d7,#4d65d9);border-radius:19px 19px 5px 19px;padding:12px 15px}.ai .message-content{padding-top:2px}.message-text{line-height:1.72;color:#e7eaf1;white-space:pre-wrap;word-break:break-word}.message-meta{display:flex;gap:7px;margin-top:9px}.meta-btn{border:1px solid var(--border);background:var(--panel);color:var(--muted);padding:5px 8px;border-radius:8px;cursor:pointer;font-size:11px}
-.typing{display:flex;gap:5px;padding:10px 0}.typing i{width:7px;height:7px;border-radius:50%;background:#aaa;animation:bounce 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-.composer-wrap{position:absolute;bottom:0;left:0;right:0;padding:15px 20px 20px;background:linear-gradient(to top,var(--bg) 65%,transparent)}.composer{width:min(900px,100%);margin:auto;background:rgba(20,22,31,.94);backdrop-filter:blur(25px);border:1px solid var(--border);border-radius:21px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}.preview-area{display:none;padding:10px;border-bottom:1px solid var(--border);gap:7px;flex-wrap:wrap}.preview-area.show{display:flex}.attachment{border:1px solid var(--border);background:var(--panel2);border-radius:11px;padding:8px 10px;font-size:11px;color:#cdd2df}.composer-input{display:flex;align-items:flex-end;gap:8px;padding:10px}.composer-tools{display:flex;align-items:center;gap:5px}.tool{width:38px;height:38px;border:0;border-radius:11px;background:transparent;color:#aeb4c3;cursor:pointer;display:grid;place-items:center;font-size:16px}.tool:hover{background:rgba(255,255,255,.06);color:white}textarea{flex:1;min-height:46px;max-height:180px;resize:none;border:0;outline:0;background:transparent;color:var(--text);font:inherit;line-height:1.5;padding:10px 4px}textarea::placeholder{color:#777e91}.send{width:42px;height:42px;border:0;border-radius:13px;background:linear-gradient(135deg,#7c5cff,#5d8cff);color:white;cursor:pointer;font-size:17px}.send:disabled{opacity:.35;cursor:not-allowed}.composer-footer{padding:0 14px 9px;color:#656c7d;font-size:10px;display:flex;justify-content:space-between}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}.modal.show{display:flex}.modal-card{width:min(500px,100%);background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.setting{padding:14px 0;border-bottom:1px solid var(--border)}.setting-title{font-weight:700;margin-bottom:5px}.setting-desc{font-size:12px;color:var(--muted)}select{margin-top:9px;padding:9px;border-radius:9px;border:1px solid var(--border);background:var(--panel2);color:white}
-.toast{position:fixed;left:50%;bottom:95px;transform:translateX(-50%) translateY(15px);padding:10px 14px;border-radius:11px;background:#20232e;color:white;border:1px solid var(--border);opacity:0;pointer-events:none;transition:.25s;z-index:200;font-size:12px}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:760px){.sidebar{position:fixed;left:-300px;top:0;bottom:0;box-shadow:20px 0 50px rgba(0,0,0,.4)}.sidebar.open{left:0}.mobile-menu{display:grid}.quick-grid{grid-template-columns:1fr}.chat-inner{padding:20px 13px 145px}.composer-wrap{padding:9px 9px 10px}.composer{border-radius:18px}.message-content{max-width:88%}.topbar{padding:0 10px}.model-pill{font-size:11px}}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#303443;border-radius:20px}
-body.light{--bg:#f4f6fa;--panel:#fff;--panel2:#eef0f5;--text:#171923;--muted:#667085;--border:rgba(20,25,40,.1)}body.light .topbar{background:rgba(244,246,250,.75)}body.light .sidebar{background:rgba(255,255,255,.85)}body.light .message-text{color:#252938}
-</style>
-</head>
-<body>
-<div class="app">
-<aside class="sidebar" id="sidebar">
-<div class="brand"><div class="logo">✦</div><div><div class="brand-name">Zubee AI</div><span class="brand-version">NEXT GEN</span></div></div>
-<button class="new-chat" onclick="newChat()">＋ New conversation</button>
-<div class="search-box"><span class="search-icon">⌕</span><input id="chatSearch" placeholder="Search conversations..." oninput="renderChatList()"></div>
-<div class="chat-list" id="chatList"></div>
-<div class="sidebar-bottom">
-<button class="side-button" onclick="exportChat()">↓ Export conversation</button>
-<button class="side-button" onclick="openSettings()">⚙ Settings</button>
-</div>
-</aside>
-<main class="main">
-<header class="topbar">
-<div class="top-left"><button class="icon-btn mobile-menu" onclick="toggleSidebar()">☰</button><div class="model-pill"><span class="status-dot"></span>Zubee AI</div></div>
-<div class="top-actions"><button class="icon-btn" onclick="toggleTheme()">◐</button><button class="icon-btn" onclick="exportChat()">↓</button><button class="icon-btn" onclick="openSettings()">⚙</button></div>
-</header>
-<section class="chat-area" id="chatArea"><div class="chat-inner" id="chatInner">
-<div class="welcome" id="welcome">
-<div class="welcome-logo">✦</div><h1>Meet <span class="gradient-text">Zubee AI</span></h1>
-<p>Your intelligent workspace for thinking, learning, creating, analysing and exploring ideas.</p>
-<div class="quick-grid">
-<button class="quick" onclick="quickPrompt('Explain a difficult topic to me in very simple language.')"><strong>🧠 Learn</strong><span>Explain any concept simply</span></button>
-<button class="quick" onclick="quickPrompt('Help me create a powerful study plan.')"><strong>📚 Study</strong><span>Build a smart study strategy</span></button>
-<button class="quick" onclick="quickPrompt('Help me brainstorm an innovative project idea.')"><strong>💡 Create</strong><span>Generate new ideas</span></button>
-<button class="quick" onclick="quickPrompt('Analyse this problem and give me the best possible approach.')"><strong>⚡ Analyse</strong><span>Break complex problems down</span></button>
-</div></div>
-<div id="messages"></div>
-</div></section>
-<div class="composer-wrap"><div class="composer">
-<div class="preview-area" id="previewArea"></div>
-<div class="composer-input"><div class="composer-tools">
-<button class="tool" title="Attach file" onclick="document.getElementById('fileInput').click()">＋</button>
-<button class="tool" title="Voice input" onclick="voiceInput()">🎙</button>
-</div>
-<textarea id="prompt" rows="1" placeholder="Message Zubee AI..." oninput="handleInput()" onkeydown="handleKey(event)"></textarea>
-<button class="send" id="sendButton" onclick="sendMessage()" disabled>↑</button>
-</div>
-<div class="composer-footer"><span>AI can make mistakes. Verify important information.</span><span id="counter">0</span></div>
-</div></div>
-</main>
-</div>
-<input id="fileInput" type="file" hidden multiple accept="image/*,.txt,.pdf,.doc,.docx,.csv" onchange="handleFiles(event)">
-<div class="modal" id="settingsModal"><div class="modal-card"><div class="modal-head"><h2>Settings</h2><button class="icon-btn" onclick="closeSettings()">×</button></div>
-<div class="setting"><div class="setting-title">Appearance</div><div class="setting-desc">Choose your preferred interface theme.</div><select onchange="setTheme(this.value)"><option value="dark">Dark</option><option value="light">Light</option></select></div>
-<div class="setting"><div class="setting-title">Local storage</div><div class="setting-desc">Conversations are stored locally in this browser.</div></div>
-<div class="setting"><div class="setting-title">Version</div><div class="setting-desc">Zubee AI experimental interface • v1.0</div></div>
-</div></div>
-<div class="toast" id="toast"></div>
-<script>
-  const API_URL = "https://zubee-ai.vercel.app/api/chat";
 
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("input");
+:root {
+  --bg: #070710;
+  --panel: rgba(18, 18, 32, 0.78);
+  --panel2: rgba(28, 28, 48, 0.72);
+  --text: #f7f7ff;
+  --muted: #9d9db3;
+  --accent: #735cff;
+  --accent2: #9b7cff;
+  --border: rgba(255,255,255,.09);
+}
 
-  const history = [];
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
 
-  function addMessage(text, type) {
-    const message = document.createElement("div");
-    message.className = "message " + type;
-    message.textContent = text;
+body {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(115,92,255,.18), transparent 28%),
+    radial-gradient(circle at 80% 80%, rgba(155,124,255,.12), transparent 28%),
+    var(--bg);
+  color: var(--text);
+}
 
-    chat.appendChild(message);
-    chat.scrollTop = chat.scrollHeight;
+/* ================= BACKGROUND ================= */
 
-    return message;
+.background {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(55px);
+  opacity: .35;
+  animation: floatOrb 12s ease-in-out infinite alternate;
+}
+
+.orb.one {
+  width: 260px;
+  height: 260px;
+  background: #6c54ff;
+  top: -80px;
+  left: -70px;
+}
+
+.orb.two {
+  width: 220px;
+  height: 220px;
+  background: #b06cff;
+  right: -70px;
+  bottom: 5%;
+  animation-delay: -4s;
+}
+
+.orb.three {
+  width: 170px;
+  height: 170px;
+  background: #405cff;
+  left: 45%;
+  top: 45%;
+  animation-delay: -7s;
+}
+
+@keyframes floatOrb {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(50px, -30px) scale(1.15);
+  }
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.65);
+  animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+  from {
+    transform: translateY(110vh);
+    opacity: 0;
   }
 
-  async function sendMessage() {
-    const text = input.value.trim();
-
-    if (!text) return;
-
-    addMessage(text, "user");
-
-    input.value = "";
-    input.disabled = true;
-
-    const thinking = addMessage("Zubee is thinking... 🧠", "ai");
-
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          message: text,
-          history: history
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || "Something went wrong."
-        );
-      }
-
-      thinking.textContent = data.answer;
-
-      history.push({
-        role: "user",
-        text: text
-      });
-
-      history.push({
-        role: "assistant",
-        text: data.answer
-      });
-
-    } catch (error) {
-      console.error(error);
-
-      thinking.textContent =
-        "Sorry 😕 Zubee couldn't connect right now.";
-    }
-
-    input.disabled = false;
-    input.focus();
-
-    chat.scrollTop = chat.scrollHeight;
+  15% {
+    opacity: 1;
   }
 
-  input.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      sendMessage();
-    }
-  });
-</script>  
-</body>
-</html>
+  85% {
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(-10vh);
+    opacity: 0;
+  }
+}
+
+/* ================= PANDA ================= */
+
+.panda {
+  position: absolute;
+  right: 6%;
+  top: 14%;
+  width: 105px;
+  height: 105px;
+  animation: pandaFloat 4s ease-in-out infinite;
+  opacity: .92;
+}
+
+@keyframes pandaFloat {
+  0%,100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-18px) rotate(2deg);
+  }
+}
+
+.panda-body {
+  position: absolute;
+  width: 72px;
+  height: 65px;
+  background: #f5f5f5;
+  border-radius: 50%;
+  left: 17px;
+  top: 30px;
+  box-shadow: 0 15px 35px rgba(0,0,0,.25);
+}
+
+.panda-head {
+  position: absolute;
+  width: 72px;
+  height: 65px;
+  background: #fff;
+  border-radius: 50%;
+  left: 17px;
+  top: 5px;
+}
+
+.ear {
+  position: absolute;
+  width: 27px;
+  height: 27px;
+  background: #111;
+  border-radius: 50%;
+  top: 0;
+}
+
+.ear.left {
+  left: 12px;
+}
+
+.ear.right {
+  right: 12px;
+}
+
+.eye {
+  position: absolute;
+  width: 18px;
+  height: 25px;
+  background: #111;
+  border-radius: 50%;
+  top: 27px;
+}
+
+.eye.left {
+  left: 15px;
+  transform: rotate(25deg);
+}
+
+.eye.right {
+  right: 15px;
+  transform: rotate(-25deg);
+}
+
+.eye::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: white;
+  border-radius: 50%;
+  top: 6px;
+  left: 5px;
+}
+
+.nose {
+  position: absolute;
+  width: 10px;
+  height: 8px;
+  background: #111;
+  border-radius: 50%;
+  left: 31px;
+  top: 46px;
+}
+
+.arm {
+  position: absolute;
+  width: 20px;
+  height: 38px;
+  background: #111;
+  border-radius: 20px;
+  top: 38px;
+}
+
+.arm.left {
+  left: 2px;
+  transform: rotate(35deg);
+}
+
+.arm.right {
+  right: 2px;
+  transform: rotate(-35deg);
+}
+
+/* ================= APP ================= */
+
+.app {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= HEADER ================= */
+
+.header {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,8,18,.62);
+  backdrop-filter: blur(20px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  background: linear-gradient(135deg, #735cff, #a477ff);
+  box-shadow: 0 8px 30px rgba(115,92,255,.35);
+}
+
+.brand-text {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -.4px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #a9a9ba;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #50e38a;
+  box-shadow: 0 0 12px #50e38a;
+}
+
+/* ================= CHAT ================= */
+
+.chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px max(18px, calc((100% - 900px)/2));
+  scroll-behavior: smooth;
+}
+
+.chat::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.12);
+  border-radius: 20px;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 22px;
+  animation: messageIn .35s ease;
+}
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: min(760px, 88%);
+  padding: 14px 17px;
+  border-radius: 20px;
+  line-height: 1.65;
+  font-size: 15px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.message.ai .bubble {
+  background: rgba(27,27,43,.82);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 7px;
+  box-shadow: 0 10px 35px rgba(0,0,0,.15);
+}
+
+.message.user .bubble {
+  background: linear-gradient(135deg, #644cff, #8067ff);
+  border-bottom-right-radius: 7px;
+  box-shadow: 0 10px 30px rgba(90,70,255,.25);
+}
+
+/* ================= WELCOME ================= */
+
+.welcome {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+}
+
+.welcome-inner {
+  max-width: 650px;
+}
+
+.big-logo {
+  width: 82px;
+  height: 82px;
+  margin: 0 auto 20px;
+  border-radius: 27px;
+  display: grid;
+  place-items: center;
+  font-size: 43px;
+  background: linear-gradient(135deg, #735cff, #a477ff);
+  box-shadow:
+    0 0 50px rgba(115,92,255,.35),
+    0 15px 50px rgba(0,0,0,.3);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%,100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.welcome h1 {
+  font-size: clamp(35px, 7vw, 58px);
+  letter-spacing: -2px;
+  margin-bottom: 10px;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #9a85ff, #d2bfff);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.welcome p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.suggestion {
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.045);
+  color: #d8d8e7;
+  padding: 10px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.suggestion:hover {
+  background: rgba(115,92,255,.15);
+  border-color: rgba(115,92,255,.5);
+  transform: translateY(-2px);
+}
+
+/* ================= INPUT ================= */
+
+.bottom {
+  padding: 12px max(15px, calc((100% - 900px)/2)) 18px;
+  background: linear-gradient(
+    to top,
+    rgba(7,7,16,1),
+    rgba(7,7,16,.72),
+    transparent
+  );
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 22px;
+  background: rgba(21,21,35,.88);
+  backdrop-filter: blur(25px);
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+
+.input-box:focus-within {
+  border-color: rgba(115,92,255,.65);
+  box-shadow:
+    0 0 0 3px rgba(115,92,255,.08),
+    0 20px 60px rgba(0,0,0,.3);
+}
+
+#input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: white;
+  padding: 13px 12px;
+  font-size: 16px;
+}
+
+#input::placeholder {
+  color: #77778b;
+}
+
+.send {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #735cff, #987cff);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: .2s;
+  box-shadow: 0 8px 25px rgba(115,92,255,.3);
+}
+
+.send:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.send:active {
+  transform: scale(.94);
+}
+
+.send:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* ================= TOOLS ================= */
+
+.tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 7px;
+  padding: 0 5px;
+}
+
+.tools span {
+  font-size: 11px;
+  color: #66667a;
+}
+
+.clear {
+  background: transparent;
+  border: 0;
+  color: #77778d;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.clear:hover {
+  color: white;
+}
+
+/* ================= TYPING ================= */
+
+.typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
