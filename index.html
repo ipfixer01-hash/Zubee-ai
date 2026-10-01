@@ -84,43 +84,89 @@ body.light{--bg:#f4f6fa;--panel:#fff;--panel2:#eef0f5;--text:#171923;--muted:#66
 </div></div>
 <div class="toast" id="toast"></div>
 <script>
-const STORAGE_KEY="zubee_ai_state_v1";
-let state={chats:[],activeChat:null,theme:"dark"},attachments=[];
-function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
-function loadState(){try{const s=localStorage.getItem(STORAGE_KEY);if(s)state=JSON.parse(s)}catch(e){}if(!state.chats||!state.chats.length)createChat();applyTheme();renderChatList();renderMessages()}
-function createChat(){const id=Date.now().toString(36)+Math.random().toString(36).slice(2);state.chats.unshift({id,title:"New conversation",messages:[]});state.activeChat=id;saveState()}
-function getActiveChat(){return state.chats.find(c=>c.id===state.activeChat)}
-function newChat(){createChat();renderChatList();renderMessages();document.getElementById("prompt").focus();closeSidebarMobile()}
-function deleteChat(id){state.chats=state.chats.filter(c=>c.id!==id);if(!state.chats.length)createChat();if(state.activeChat===id)state.activeChat=state.chats[0].id;saveState();renderChatList();renderMessages()}
-function selectChat(id){state.activeChat=id;saveState();renderChatList();renderMessages();closeSidebarMobile()}
-function renderChatList(){const list=document.getElementById("chatList"),search=document.getElementById("chatSearch").value.toLowerCase();list.innerHTML="";state.chats.filter(c=>c.title.toLowerCase().includes(search)).forEach(chat=>{const item=document.createElement("div");item.className="chat-item "+(chat.id===state.activeChat?"active":"");item.innerHTML=`<span>💬</span><span class="chat-title">${escapeHTML(chat.title)}</span><button class="delete-chat" onclick="event.stopPropagation();deleteChat('${chat.id}')">×</button>`;item.onclick=()=>selectChat(chat.id);list.appendChild(item)})}
-function renderMessages(){const container=document.getElementById("messages"),welcome=document.getElementById("welcome");container.innerHTML="";const chat=getActiveChat();if(!chat)return;welcome.style.display=chat.messages.length?"none":"flex";chat.messages.forEach(m=>addMessageToDOM(m.role,m.text,false));scrollBottom()}
-function addMessageToDOM(role,text,animate=true){const row=document.createElement("div");row.className="message-row "+(role==="user"?"user":"ai");row.innerHTML=`<div class="avatar">${role==="user"?"U":"✦"}</div><div class="message-content"><div class="message-text">${formatText(text)}</div>${role==="ai"?`<div class="message-meta"><button class="meta-btn" onclick="copyText(this)">Copy</button><button class="meta-btn" onclick="speakText(this)">🔊</button><button class="meta-btn" onclick="regenerate()">↻ Regenerate</button></div>`:""}</div>`;document.getElementById("messages").appendChild(row);if(animate)scrollBottom()}
-function sendMessage(){const input=document.getElementById("prompt"),text=input.value.trim();if(!text)return;const chat=getActiveChat();if(!chat)return;if(!chat.messages.length)chat.title=text.length>35?text.slice(0,35)+"...":text;chat.messages.push({role:"user",text});input.value="";handleInput();attachments=[];document.getElementById("previewArea").classList.remove("show");saveState();renderChatList();document.getElementById("welcome").style.display="none";addMessageToDOM("user",text);simulateAI(text)}
-function simulateAI(userText){const container=document.getElementById("messages"),row=document.createElement("div");row.className="message-row ai";row.innerHTML=`<div class="avatar">✦</div><div class="message-content"><div class="typing"><i></i><i></i><i></i></div></div>`;container.appendChild(row);scrollBottom();setTimeout(()=>{row.remove();const answer=generateLocalResponse(userText),chat=getActiveChat();chat.messages.push({role:"ai",text:answer});saveState();addMessageToDOM("ai",answer)},700)}
-function generateLocalResponse(text){const t=text.toLowerCase();if(t.includes("hello")||t.includes("hi"))return `Hello! 👋\n\nI'm Zubee AI's interface demo.\n\nMy advanced UI is ready, but the real AI model has not been connected yet.\n\nNext step: connect a real free/local model to this interface.`;if(t.includes("study")||t.includes("exam"))return `Absolutely. 📚\n\nA strong study workflow is:\n\n1. Learn the concept.\n2. Recall without looking.\n3. Solve exam-level questions.\n4. Analyse mistakes.\n5. Revise weak areas.\n6. Repeat using spaced revision.\n\nOnce the real AI backend is connected, I can generate a personalised plan.`;return `I received your message:\n\n"${text}"\n\nThe Zubee AI interface is working successfully. ⚡\n\nThe next upgrade is connecting an actual AI model so responses are generated dynamically instead of coming from local demo logic.`}
-function handleInput(){const input=document.getElementById("prompt");document.getElementById("sendButton").disabled=!input.value.trim();document.getElementById("counter").textContent=input.value.length;input.style.height="auto";input.style.height=Math.min(input.scrollHeight,180)+"px"}
-function handleKey(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}}
-function quickPrompt(text){const input=document.getElementById("prompt");input.value=text;handleInput();input.focus()}
-function copyText(button){const text=button.closest(".message-content").querySelector(".message-text").innerText;navigator.clipboard.writeText(text).then(()=>showToast("Copied ✓"))}
-function speakText(button){const text=button.closest(".message-content").querySelector(".message-text").innerText;if(!("speechSynthesis"in window)){showToast("Speech not supported");return}speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(text))}
-function voiceInput(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){showToast("Voice recognition isn't supported here.");return}const r=new SR();r.lang="en-IN";r.interimResults=false;showToast("Listening... 🎙");r.start();r.onresult=e=>{const input=document.getElementById("prompt");input.value+=(input.value?" ":"")+e.results[0][0].transcript;handleInput()}}
-function handleFiles(e){attachments.push(...Array.from(e.target.files));const p=document.getElementById("previewArea");p.innerHTML="";attachments.forEach(f=>{const x=document.createElement("div");x.className="attachment";x.textContent="📎 "+f.name;p.appendChild(x)});if(attachments.length)p.classList.add("show")}
-function exportChat(){const chat=getActiveChat();if(!chat)return;let out="ZUBEE AI CONVERSATION\n\n";chat.messages.forEach(m=>out+=(m.role==="user"?"YOU":"ZUBEE AI")+":\n"+m.text+"\n\n");const a=document.createElement("a"),url=URL.createObjectURL(new Blob([out],{type:"text/plain"}));a.href=url;a.download="zubee-ai-conversation.txt";a.click();URL.revokeObjectURL(url);showToast("Conversation exported ✓")}
-function regenerate(){const chat=getActiveChat();if(!chat||chat.messages.length<2)return;const last=[...chat.messages].reverse().find(m=>m.role==="user");if(last)simulateAI(last.text)}
-function toggleTheme(){state.theme=state.theme==="dark"?"light":"dark";applyTheme();saveState()}
-function setTheme(theme){state.theme=theme;applyTheme();saveState()}
-function applyTheme(){document.body.classList.toggle("light",state.theme==="light")}
-function openSettings(){document.getElementById("settingsModal").classList.add("show")}
-function closeSettings(){document.getElementById("settingsModal").classList.remove("show")}
-function toggleSidebar(){document.getElementById("sidebar").classList.toggle("open")}
-function closeSidebarMobile(){document.getElementById("sidebar").classList.remove("open")}
-function scrollBottom(){setTimeout(()=>{const a=document.getElementById("chatArea");a.scrollTop=a.scrollHeight},20)}
-let toastTimer;function showToast(message){const t=document.getElementById("toast");t.textContent=message;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2200)}
-function escapeHTML(text){return text.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
-function formatText(text){let s=escapeHTML(text);s=s.replace(/`([^`]+)`/g,"<code>$1</code>");s=s.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");return s}
-document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();document.getElementById("chatSearch").focus()}if(e.key==="Escape"){closeSettings();closeSidebarMobile()}})
-loadState();
-</script>
+  const API_URL = "https://zubee-ai.vercel.app/api/chat";
+
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("input");
+
+  const history = [];
+
+  function addMessage(text, type) {
+    const message = document.createElement("div");
+    message.className = "message " + type;
+    message.textContent = text;
+
+    chat.appendChild(message);
+    chat.scrollTop = chat.scrollHeight;
+
+    return message;
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    addMessage(text, "user");
+
+    input.value = "";
+    input.disabled = true;
+
+    const thinking = addMessage("Zubee is thinking... 🧠", "ai");
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          message: text,
+          history: history
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Something went wrong."
+        );
+      }
+
+      thinking.textContent = data.answer;
+
+      history.push({
+        role: "user",
+        text: text
+      });
+
+      history.push({
+        role: "assistant",
+        text: data.answer
+      });
+
+    } catch (error) {
+      console.error(error);
+
+      thinking.textContent =
+        "Sorry 😕 Zubee couldn't connect right now.";
+    }
+
+    input.disabled = false;
+    input.focus();
+
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  input.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      sendMessage();
+    }
+  });
+</script>  
 </body>
 </html>
